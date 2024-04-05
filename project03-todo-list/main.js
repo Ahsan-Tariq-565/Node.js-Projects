@@ -1,66 +1,127 @@
 #! /usr/bin/env node
 import inquirer from "inquirer";
 import chalk from "chalk";
-let todos_list = [];
-let while_conditions = true;
-//-------------------------------------------- Options ---------------------------------------------------------------------------//
-console.log(chalk.blueBright("\n \tWelcome to 'Code with Ahsan' - Todo-List App\n"));
-while (while_conditions) {
+let todoList = [];
+let whileConditions = true;
+console.log(chalk.blueBright("\n\tWelcome to 'Code with Ahsan' - Todo-List App\n"));
+while (whileConditions) {
+    //--------------------------------------------------------------------------- Options -------------------------------------------------------------------------//    
     let option = await inquirer.prompt([
         {
-            name: "user_option",
+            name: "userOption",
             type: "list",
-            message: (chalk.yellow("select an options :")),
-            choices: ["add", "remove"]
+            message: "Select an options :\n",
+            choices: ["Add", "Show list", "Update", "Remove"],
         }
     ]);
     //-------------------------------------------------- Add --------------------------------------------------------------------//
-    if (option.user_option === "add") {
+    if (option.userOption === "Add") {
         let ans = await inquirer.prompt([
             {
-                name: "user_ans",
+                name: "userAns",
                 type: "input",
-                message: (chalk.yellow("write something to add in the todo list :"))
-            }
+                message: "\nWrite something to add in the task list:"
+            },
         ]);
-        if (ans.user_ans !== '') {
-            todos_list.push(ans.user_ans);
-            console.log(chalk.green(`${todos_list}: add to your todo list`));
+        if (ans.userAns !== '') {
+            todoList.push(ans.userAns);
+            console.log(chalk.green.bold("\n Task added successfully."));
+            console.log(chalk.bold("\n\t Updated List:"));
+            todoList.forEach((item) => {
+                console.log(chalk.green(`\t- ${item}`));
+            });
+            console.log('\n');
         }
         else {
-            console.log(chalk.yellow("Please write something to add in the todo list"));
+            console.log(chalk.red("\n ! You cannot enter an empty item in the list.\n"));
+        }
+    }
+    //---------------------------------------------------- Show list----------------------------------------------------------------//
+    else if (option.userOption === "Show list") {
+        if (todoList.length > 0) {
+            console.log(chalk.bold("\n\tYour list:"));
+            todoList.forEach((item) => {
+                console.log(chalk.cyan(`\t- ${item}`));
+            });
+            console.log('\n');
+        }
+        else {
+            console.log(chalk.yellow("\n\tThe list is empty.\n"));
         }
     }
     //------------------------------------------------------- Remove -----------------------------------------------------------------//
-    if (option.user_option === "remove") {
-        let removeChoice = await inquirer.prompt([
-            {
-                name: "remove_item",
-                type: "list",
-                message: (chalk.yellow("select an item to remove :")),
-                choices: todos_list
+    else if (option.userOption === "Remove") {
+        if (todoList.length > 0) {
+            let removeChoice = await inquirer.prompt([
+                {
+                    name: "removeItem",
+                    type: "list",
+                    message: "\nSelect an item to remove:",
+                    choices: todoList,
+                },
+            ]);
+            let indexToRemove = todoList.indexOf(removeChoice.removeItem);
+            if (indexToRemove >= 0) {
+                todoList.splice(indexToRemove, 1);
+                console.log(chalk.red.bold(`\n You removed: ${removeChoice.removeItem}`));
+                console.log(chalk.bold("\n\t Updated List:"));
+                todoList.forEach((item) => {
+                    console.log(chalk.green(`\t- ${item}`));
+                });
+                console.log('\n');
             }
-        ]);
-        let index_to_remove = todos_list.indexOf(removeChoice.remove_item);
-        if (index_to_remove >= 0) {
-            todos_list.splice(index_to_remove, 1);
-            console.log(chalk.red(`${removeChoice.remove_item}: removed from your todo list`));
+        }
+        else {
+            console.log(chalk.red("\n\tThe To-Do list is Empty. Add something before removing. \n"));
         }
     }
-    //------------------------------------------ Breaking/stoping while- loop (by false the while loop condition)`-----------------------------------
-    let user_ans = await inquirer.prompt([
+    //-------------------------------------------------- Update ---------------------------------------------------------------------------//
+    else if (option.userOption === "Update") {
+        if (todoList.length > 0) {
+            let updateShow = await inquirer.prompt([
+                {
+                    name: "updateItem",
+                    type: "list",
+                    message: "\nSelect an item to update:",
+                    choices: todoList,
+                },
+            ]);
+            let index = todoList.indexOf(updateShow.updateItem);
+            let eidtValue = await inquirer.prompt([
+                {
+                    name: "editItem",
+                    type: "input",
+                    message: "\nEnter the updated task"
+                }
+            ]);
+            if (eidtValue.edit_item !== "") {
+                todoList[index] = eidtValue.editItem;
+                console.log(chalk.green.bold("\n Task updated successfully."));
+                console.log(chalk.bold("\n\t Updated List:"));
+                todoList.forEach((todoList) => {
+                    console.log(chalk.green(`\t- ${todoList}`));
+                });
+                console.log('\n');
+            }
+            else {
+                console.log(chalk.red("\n ! You cannot update to an empty item. \n"));
+            }
+        }
+        else {
+            console.log(chalk.yellow("\n\t The To-Do list is Empty. Please add tasks before updating.\n"));
+        }
+    }
+    //------------------------------------------ Breaking/stoping while-loop (by false the while loop condition)`And Conformation------------------------------------------//
+    let userAns = await inquirer.prompt([
         {
             name: "selection",
             type: "confirm",
-            message: (chalk.yellow("Do you want to continue ?")),
+            message: ("Do you want to continue ?"),
             default: true
         }
     ]);
-    if (user_ans.selection === false) {
-        while_conditions = false;
+    if (userAns.selection === false) {
+        whileConditions = false;
     }
 }
-console.log(chalk.blue("\n \tYour Updated Todos-List is : \n"));
-todos_list.forEach(function (element, index) {
-    console.log(chalk.greenBright((index + 1) + ' ' + element));
-});
+console.log(chalk.blueBright("\n\tThank you for using 'Code with Ahsan' - Todo-List App\n"));
